@@ -10,7 +10,7 @@ RUN yum-builddep R -y
 RUN yum-config-manager --enable "rhel-*-optional-rpms"
 RUN yum install -q -y wget xorg-x11-server-devel libX11-devel libXt-devel \
     curl-devel gcc-c++ gcc-gfortran zlib-devel bzip2 bzip2-libs java-1.8.0-openjdk-devel \
-	python38-devel.x86_64 python38-virtualenv.noarch python3
+	python38-devel.x86_64 python38-virtualenv.noarch
 RUN yum -y install libgit2-devel libxml2-devel openssl-devel pcre2-devel make which
 
 ARG VERSION=4.0.4
@@ -37,12 +37,12 @@ RUN /var/task/R/bin/Rscript -e 'install.packages(c("git2r", "aws.s3","bupaR", "d
   
 RUN /var/task/R/bin/Rscript -e 'install.packages(c("reticulate", "keras", "caret"), repos="http://cran.r-project.org")'
 
-RUN /var/task/R/bin/Rscript -e 'install.packages(c("networkD3", "htmlwidgets", "caret"), repos="http://cran.r-project.org")'
+RUN /var/task/R/bin/Rscript -e 'install.packages(c("networkD3", "htmlwidget", "caret"), repos="http://cran.r-project.org")'
   
   
 # Virtual environment for Reticulate
-RUN python38 -m pip install --upgrade pip && \
-    python38 -m venv lambda && \
+RUN python3 -m pip install --upgrade pip && \
+    python3 -m venv lambda && \
 	source lambda/bin/activate
 	
 RUN /lambda/bin/pip3 install rpy2 numpy \
