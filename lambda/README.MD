@@ -10,3 +10,6 @@ Steps:
 7. Modify Lambda function configuration settings to increase ephemeral storage limit 
 8. Test function
 9. Add EventBridge rule to fire Lambda every 10 minutes to keep ephemeral storage persistent
+
+
+![](lambda/AWS Lambda 10 GB Ephemereal Storage.png)
