@@ -1,4 +1,4 @@
-AWS Lambda 10 GB Ephemeral Storage
+Hosting AWS Lambda Runtimes in AWS S3
 
 Steps:
 1. Docker file to load AWS CLI to Lambda Layer (we want the ‘aws s3 sync’ command in lambda /opt directory)
