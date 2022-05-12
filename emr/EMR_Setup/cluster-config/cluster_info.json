@@ -1,0 +1,19 @@
+{
+    "Clusters": [
+        {
+            "Id": "j-36LYKW4WKV3VJ",
+            "Name": "PGx-ADE",
+            "Status": {
+                "State": "BOOTSTRAPPING",
+                "StateChangeReason": {
+                    "Message": "Running bootstrap actions"
+                },
+                "Timeline": {
+                    "CreationDateTime": "2022-04-03T11:34:53.242000+00:00"
+                }
+            },
+            "NormalizedInstanceHours": 0,
+            "ClusterArn": "arn:aws:elasticmapreduce:us-east-1:535362115856:cluster/j-36LYKW4WKV3VJ"
+        }
+    ]
+}

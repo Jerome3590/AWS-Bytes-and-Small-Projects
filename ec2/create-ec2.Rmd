@@ -1,0 +1,24 @@
+---
+title: "create-ec2"
+author: "Jerome Dixon"
+date: "2/15/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{sh}
+
+aws ec2 request-spot-instances --spot-price "0.003" --instance-count 2 --type "persistent" --launch-specification file://ec2-params.json --instance-interruption-behavior "stop" --block-duration-minutes 180 --profile ""
+
+
+```
+
+
+```{sh}
+
+```
+

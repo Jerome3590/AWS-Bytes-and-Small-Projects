@@ -1,0 +1,60 @@
+#Lambda base image Amazon Linux
+FROM public.ecr.aws/lambda/provided:al2 as builder 
+
+RUN yum -y update
+RUN yum -y install deltarpm
+
+RUN yum -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm 
+RUN yum -y install yum-utils
+RUN yum-builddep R -y
+RUN yum-config-manager --enable "rhel-*-optional-rpms"
+RUN yum install -q -y wget xorg-x11-server-devel libX11-devel libXt-devel \
+    curl-devel gcc-c++ gcc-gfortran zlib-devel bzip2 bzip2-libs java-1.8.0-openjdk-devel \
+	python38-devel.x86_64 python38-virtualenv.noarch
+RUN yum -y install libgit2-devel libxml2-devel openssl-devel pcre2-devel make which
+
+ARG VERSION=4.0.4
+ARG R_DIR=/var/task/R/
+
+RUN wget -q https://cran.r-project.org/src/base/R-4/R-${VERSION}.tar.gz && \
+    mkdir ${R_DIR} && \
+    tar -xf R-${VERSION}.tar.gz && \
+    mv R-${VERSION}/* ${R_DIR} && \
+    rm R-${VERSION}.tar.gz
+
+WORKDIR ${R_DIR}
+RUN ./configure --prefix=${R_DIR} --exec-prefix=${R_DIR} --with-libpth-prefix=/var/lib --enable-R-shlib && \
+    make
+
+RUN /var/task/R/bin/Rscript -e 'install.packages(c("httr", "aws.signature", "aws.s3", \
+  "jsonlite", "logging","xml2"), repos="http://cran.r-project.org")'
+
+RUN /var/task/R/bin/Rscript -e 'install.packages(c("magrittr", "data.table", "tidyverse", \     
+  "lubridate", "readxl","readr", "reshape2", "purrr"), repos="http://cran.r-project.org")'
+
+RUN /var/task/R/bin/Rscript -e 'install.packages(c("git2r", "aws.s3","bupaR", "deSolve", \        
+  "ggplot2", "gtable", "kableExtra"), repos="http://cran.r-project.org")'
+  
+RUN /var/task/R/bin/Rscript -e 'install.packages(c("reticulate", "keras", "caret"), repos="http://cran.r-project.org")'
+
+RUN /var/task/R/bin/Rscript -e 'install.packages(c("networkD3", "htmlwidget", "caret"), repos="http://cran.r-project.org")'
+  
+  
+# Virtual environment for Reticulate
+RUN python3 -m pip install --upgrade pip && \
+    python3 -m venv lambda && \
+	source lambda/bin/activate
+	
+RUN /lambda/bin/pip3 install rpy2 numpy \
+    twython scipy pandas matplotlib scikit-learn \
+	scrapy beautifulsoup twilio boto3 pytextrank spacy
+
+# Project Files
+COPY bootstrap /var/runtime
+RUN chmod 755 /var/runtime/bootstrap
+
+COPY sankey.R /var/task
+RUN chmod 755 /var/task/sankey.R
+
+CMD ["sankey.R"]
+

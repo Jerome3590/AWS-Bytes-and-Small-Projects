@@ -1,0 +1,29 @@
+# Install R
+FROM public.ecr.aws/u6k6n4j8/r-base:latest
+RUN apt-get update
+RUN apt-get -y install libssl-dev git build-essential \
+ checkinstall zlib1g-dev libxml2-dev libcurl4-openssl-dev \
+ libfontconfig1-dev
+
+RUN install.r dplyr magrittr aws.s3 httr jsonlite data.table logging
+RUN install.r bupaR deSolve purrr readxl tidyverse readr
+RUN install.r ggplot2 gtable kableExtra
+
+FROM amazon/aws-lambda-provided:al2
+
+WORKDIR /var/runtime/
+COPY bootstrap bootstrap
+RUN chmod 755 bootstrap
+
+WORKDIR /var/task/
+COPY example.R example.R
+RUN chmod 755 example.R
+
+CMD [ "bootstrap" ]
+
+
+
+
+
+
+

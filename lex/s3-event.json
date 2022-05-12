@@ -1,0 +1,19 @@
+{
+    "Records": [
+        {
+            "eventID": "f2f67f9c3efedcf4de5002df1c920a02", "eventName": "INSERT", "eventVersion": "1.1",
+            "eventSource": "aws:dynamodb", "awsRegion": "us-east-1", "dynamodb": {
+            "ApproximateCreationDateTime": 1592340013.0, "Keys": {"UserID": {"S": "18048733575"}}, "NewImage": {
+                "Slots": {
+                    "M": {
+                        "fname": {"S": "Jerry"}, "lname": {"S": "Tracy"}, "shelter": {"S": "2"}, "bday": {
+                            "S": "1975-02-23"
+                        }, "personalRelations": {
+                            "S": "2"
+                        }
+                    }
+                }, "IntentName": {"S": "test"}, "UserID": {
+                    "S": "18048733575"
+                }}, "SequenceNumber": "115081100000000018112062729", "SizeBytes": 121, "StreamViewType": "NEW_IMAGE"
+        }, "eventSourceARN": "arn:aws:dynamodb:us-east-1:948575037990:table/YSAT/stream/2020-06-16T18:07:18.268"
+    }]}

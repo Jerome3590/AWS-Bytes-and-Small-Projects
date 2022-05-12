@@ -1,0 +1,75 @@
+---
+title: "Data Viz"
+author: "Jerome Dixon"
+date: "4/2/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r DataViz-FPGrowth-Network, eval=TRUE}
+
+# extract association rules
+assoc_rules <- ml_association_rules(fp_model) %>%
+  collect %>%
+  dplyr::mutate(antecedent = map_chr(antecedent, str_c, sep = " + ", collapse = " + ")) %>%
+  dplyr::mutate(consequent = map_chr(consequent, str_c, sep = " + ", collapse = " + "))
+
+# create a list of distinct antecedents
+ante <- assoc_rules %>%
+      distinct(antecedent) %>%
+      transmute(name = antecedent)
+
+# create a list of distinct consequents, combine them with distinct antecedents to create a list of network nodes
+# add a unique id to every node
+nodes <- assoc_rules %>%
+  distinct(consequent) %>%
+  transmute(name = consequent) %>%
+  bind_rows(ante) %>%
+  distinct() %>%
+  mutate(group = "1") %>%
+  mutate(row_id = seq(from = 0, length.out = length(name)), size = 20)
+
+# extract directed link information from association rules, and add corresponding node IDs
+links <- assoc_rules %>%
+  left_join(nodes, by = c("antecedent" = "name")) %>%
+  mutate(antecedent_row_id = row_id) %>%
+  select(-row_id) %>%
+  left_join(nodes, by = c("consequent" = "name")) %>%
+  mutate(consequent_row_id = row_id) %>%
+  select(-row_id,-group.x,-group.y)
+
+# create the network visual using the nodes and links
+
+faers_drug_network <- forceNetwork(Links = as.data.frame(links), Nodes = as.data.frame(nodes), Source = "antecedent_row_id",
+             Target = "consequent_row_id", Value = "confidence", NodeID = "name",
+             Group = "group", opacity = 0.9, arrows = TRUE, linkWidth = JS("function(d) { return d.value * 4; }"),
+             Nodesize = "size", fontSize = 15, fontFamily = "arial", linkDistance = 100, charge = -30, bounded = TRUE,
+             opacityNoHover = 0.5)
+
+saveNetwork(faers_drug_network, "faers_drug_network.html", selfcontained = TRUE)
+
+```
+
+---  
+### [Click Here for Results of Drug Market Basket Analysis with FPGrowth Algorithm](https://plotly-demo.s3.amazonaws.com/drug_network.html)
+
+
+```{r Render-Markdown, include=FALSE}
+
+# Large objects - Using this method to knit document
+rmarkdown::render("Exploratory_Data_Analysis.Rmd")
+
+```
+
+
+```{sh Copy-Rmarkdown, include=FALSE, eval=FALSE}
+
+aws s3 cp 'Exploratory_Data_Analysis.html' s3://plotly-demo/ 
+
+aws s3 cp 'faers_drug_network.html' s3://plotly-demo/
+     
+```
+

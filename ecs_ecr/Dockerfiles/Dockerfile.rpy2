@@ -1,0 +1,26 @@
+#Lambda base image Amazon Linux
+FROM public.ecr.aws/lambda/provided as builder 
+
+RUN yum -y update
+RUN yum -y install deltarpm
+
+RUN  yum -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm 
+RUN  yum -y install yum-utils
+RUN  yum-builddep R -y
+RUN  yum-config-manager --enable "rhel-*-optional-rpms"
+
+RUN yum -y install R
+
+RUN ./bin/Rscript -e 'install.packages(c("httr", "aws.signature", "aws.s3", "jsonlite", \
+  "logging","xml2"), repos="http://cran.r-project.org")'  \
+  ./bin/Rscript -e 'install.packages(c("magrittr","data.table","tidyverse","readxl", \
+  "readr", "purrr"), repos="http://cran.r-project.org")'  \
+  ./bin/Rscript -e 'install.packages(c("git2r", "aws.s3","bupaR","deSolve", "ggplot2",\
+  "gtable", "KableExtra"), repos="http://cran.r-project.org")'
+  
+RUN yum -y install python3-dev python3-pip
+RUN pip3 install --no-input --upgrade pandas numpy scipy scikit-learn simpy rpy2
+
+#TODO: COPY bootstrap ${LAMBDA_TASK_ROOT}
+#TODO: COPY example.R ${LAMBDA_TASK_ROOT}
+#TODO: CMD ["bootstrap"]

@@ -1,0 +1,155 @@
+{
+    "Cluster": {
+        "Id": "j-36LYKW4WKV3VJ",
+        "Name": "PGx-ADE",
+        "Status": {
+            "State": "BOOTSTRAPPING",
+            "StateChangeReason": {
+                "Message": "Running bootstrap actions"
+            },
+            "Timeline": {
+                "CreationDateTime": "2022-04-03T11:34:53.242000+00:00"
+            }
+        },
+        "Ec2InstanceAttributes": {
+            "Ec2KeyName": "ecs-lambda",
+            "Ec2SubnetId": "subnet-07950d9f2eb4d936d",
+            "RequestedEc2SubnetIds": [
+                "subnet-07950d9f2eb4d936d"
+            ],
+            "Ec2AvailabilityZone": "us-east-1a",
+            "RequestedEc2AvailabilityZones": [],
+            "IamInstanceProfile": "EMR_EC2_DefaultRole",
+            "EmrManagedMasterSecurityGroup": "sg-063a1a27f01fac9b1",
+            "EmrManagedSlaveSecurityGroup": "sg-040af67bc708a5425"
+        },
+        "InstanceCollectionType": "INSTANCE_GROUP",
+        "LogUri": "s3n://aws-logs-535362115856-us-east-1/elasticmapreduce/",
+        "ReleaseLabel": "emr-6.4.0",
+        "AutoTerminate": false,
+        "TerminationProtected": false,
+        "VisibleToAllUsers": true,
+        "Applications": [
+            {
+                "Name": "Hadoop",
+                "Version": "3.2.1"
+            },
+            {
+                "Name": "Hive",
+                "Version": "3.1.2"
+            },
+            {
+                "Name": "Hue",
+                "Version": "4.9.0"
+            },
+            {
+                "Name": "Spark",
+                "Version": "3.1.2"
+            },
+            {
+                "Name": "Pig",
+                "Version": "0.17.0"
+            }
+        ],
+        "Tags": [
+            {
+                "Key": "Project",
+                "Value": "ILS"
+            }
+        ],
+        "ServiceRole": "EMR_DefaultRole",
+        "NormalizedInstanceHours": 0,
+        "MasterPublicDnsName": "ec2-3-94-98-85.compute-1.amazonaws.com",
+        "Configurations": [],
+        "AutoScalingRole": "EMR_AutoScaling_DefaultRole",
+        "ScaleDownBehavior": "TERMINATE_AT_TASK_COMPLETION",
+        "EbsRootVolumeSize": 100,
+        "KerberosAttributes": {},
+        "ClusterArn": "arn:aws:elasticmapreduce:us-east-1:535362115856:cluster/j-36LYKW4WKV3VJ",
+        "StepConcurrencyLevel": 1,
+        "PlacementGroups": [],
+        "BootstrapActions": [
+            {
+                "Name": "Install R|RStudio",
+                "ScriptPath": "s3://pgx-terraform/scripts/sparklyr_emr6.sh",
+                "Args": []
+            }
+        ],
+        "InstanceGroups": [
+            {
+                "Id": "ig-VV487YU18ZDJ",
+                "Name": "Core - 4",
+                "Market": "SPOT",
+                "InstanceGroupType": "CORE",
+                "InstanceType": "c4.8xlarge",
+                "RequestedInstanceCount": 5,
+                "RunningInstanceCount": 0,
+                "Status": {
+                    "State": "BOOTSTRAPPING",
+                    "StateChangeReason": {
+                        "Message": ""
+                    },
+                    "Timeline": {
+                        "CreationDateTime": "2022-04-03T11:34:53.246000+00:00"
+                    }
+                },
+                "Configurations": [],
+                "ConfigurationsVersion": 0,
+                "EbsBlockDevices": [
+                    {
+                        "VolumeSpecification": {
+                            "VolumeType": "gp2",
+                            "SizeInGB": 80
+                        },
+                        "Device": "/dev/sdb"
+                    },
+                    {
+                        "VolumeSpecification": {
+                            "VolumeType": "gp2",
+                            "SizeInGB": 80
+                        },
+                        "Device": "/dev/sdc"
+                    }
+                ],
+                "ShrinkPolicy": {}
+            },
+            {
+                "Id": "ig-3H3R4IQ2V9URO",
+                "Name": "Master - 1",
+                "Market": "SPOT",
+                "InstanceGroupType": "MASTER",
+                "InstanceType": "c4.8xlarge",
+                "RequestedInstanceCount": 1,
+                "RunningInstanceCount": 0,
+                "Status": {
+                    "State": "BOOTSTRAPPING",
+                    "StateChangeReason": {
+                        "Message": ""
+                    },
+                    "Timeline": {
+                        "CreationDateTime": "2022-04-03T11:34:53.246000+00:00"
+                    }
+                },
+                "Configurations": [],
+                "ConfigurationsVersion": 0,
+                "EbsBlockDevices": [
+                    {
+                        "VolumeSpecification": {
+                            "VolumeType": "gp2",
+                            "SizeInGB": 80
+                        },
+                        "Device": "/dev/sdb"
+                    },
+                    {
+                        "VolumeSpecification": {
+                            "VolumeType": "gp2",
+                            "SizeInGB": 80
+                        },
+                        "Device": "/dev/sdc"
+                    }
+                ],
+                "ShrinkPolicy": {}
+            }
+        ]
+    }
+}

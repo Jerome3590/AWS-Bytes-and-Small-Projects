@@ -1,0 +1,89 @@
+---
+title: "S3 Cross Account Access"
+author: "Jerome Dixon"
+date: "1/12/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+
+library(here)
+library(here)
+library(aws.s3)
+library(aws.signature)
+
+```
+
+# Setup AWS credentials according to this:
+https://www.gormanalysis.com/blog/connecting-to-aws-s3-with-r/
+https://support.rstudio.com/hc/en-us/articles/360047157094-Managing-R-with-Rprofile-Renviron-Rprofile-site-Renviron-site-rsession-conf-and-repos-conf
+
+# Key comment: The usethis package includes a helper function for editing .Renviron files from an R session with usethis::edit_r_environ(). 
+
+# Cross Account Access for S3 Bucket
+Cross Account Bucket- arn:aws:s3:::{bucket-name}
+Cross Account User - "AWS": "arn:aws:iam::123456789012:user/user_name"
+
+# Direct Account Access
+1. Create organizational account with S3 programmatic access only. Save credentials 
+
+2. via AWS CLI/shell command create profile with credentials: aws configure --profile {profile_name}
+
+# Configure Multiple Accounts
+# Account1
+aws configure --profile account1
+AWS_ACCESS_KEY_ID={AWS_ACCESS_KEY_ID_ACCOUNT1}
+AWS_SECRET_ACCESS_KEY_ID={AWS_SECRET_ACCESS_KEY_ID1}
+AWS_DEFAULT_REGION=us-east-1
+
+# Account2
+aws configure --profile account2
+AWS_ACCESS_KEY_ID={AWS_ACCESS_KEY_ID_ACCOUNT2}
+AWS_SECRET_ACCESS_KEY={AWS_SECRET_ACCESS_KEY_ID2}
+AWS_DEFAULT_REGION=us-east-1
+
+3. Switch between profiles as needed (aws.signature)
+use_credentials(profile = "account2")
+
+
+
+```{sh S3-Bucket-Access}
+
+aws s3api put-bucket-policy --bucket {bucket_name} --policy file://s3-access-bucket.json --profile {profile_name}
+
+
+```
+
+
+```{sh User-Access-Policy}
+
+aws iam create-policy --policy-name s3-access --policy-document file://s3-access-user.json --profile default
+
+```
+
+
+```{r}
+
+use_credentials(profile = "default")
+
+```
+
+
+#Attach to user in IAM console - Doesn't work very well
+```{sh Attach-Policy-User}
+
+aws iam attach-user-policy --policy-arn arn:aws:iam::123456789:policy/s3-access --user-name {user_name}
+
+```
+
+
+# Preferred Method
+```{r test-s3}
+
+use_credentials(profile = "default")
+
+get_bucket(bucket = "{bucket_name}")
+
+```

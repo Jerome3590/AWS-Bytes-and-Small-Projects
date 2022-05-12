@@ -1,0 +1,45 @@
+import json
+import boto3
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+from email.mime.application import MIMEApplication
+
+def lambda_handler(event, context):
+    
+    ses_client = boto3.client("ses")
+    s3_client = boto3.client("s3")
+    
+    for i in event["Records"]:
+        action = i["eventName"]
+        ip = i["requestParameters"]["sourceIPAddress"]
+        bucket_name = i["s3"]["object"]["key"]
+        object = i["s3"]["object"]["key"]
+        
+    fileObj = s3_client.get_object(Bucket = 'dbhds-lex-files', Key = object)
+    file_content = fileObj["Body"].read()
+    
+    sender = "ysat@cana-chatbot.awsapps.com"
+    to = "western-tidewater@cana-chatbot.awsapps.com"
+    subject = str(action) + 'Event from ' + bucket_name
+    body= """
+    <br>
+    This is an email notification of completed survey.
+    """.format(action)
+    
+    msg = MIMEMultipart()
+    msg["Subject"] = subject
+    msg["From"] = sender
+    msg["To"] = to
+    
+    body_txt = MIMEText(body,"html")
+    
+    attachment = MIMEApplication(file_content)
+    attachment.add_header("Content-Disposition", "attachment", filename ="client.csv")
+    
+    msg.attach(body_txt)
+    msg.attach(attachment)
+        
+   
+    response = ses_client.send_raw_email(Source = sender, Destinations = [to], RawMessage = {"Data":msg.as_string()})
+    
+  

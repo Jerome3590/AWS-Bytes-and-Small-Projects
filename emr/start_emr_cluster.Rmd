@@ -1,0 +1,113 @@
+---
+title: "AWS_EMR_Start_Cluster"
+author: "Jerome Dixon"
+date: "1/22/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{sh EMR Create Cluster, echo=TRUE, eval=FALSE }
+
+aws emr create-cluster --applications Name=Hadoop Name=Hive Name=Hue Name=Spark Name=Pig --tags 'Project=ILS' --ec2-attributes '{"KeyName":"ecs-lambda","InstanceProfile":"EMR_EC2_DefaultRole","SubnetId":"subnet-07950d9f2eb4d936d","EmrManagedSlaveSecurityGroup":"sg-040af67bc708a5425","EmrManagedMasterSecurityGroup":"sg-063a1a27f01fac9b1"}' --release-label emr-6.4.0 --log-uri 's3n://aws-logs-535362115856-us-east-1/elasticmapreduce/' --instance-groups '[{"InstanceCount":5,"BidPrice":"OnDemandPrice","EbsConfiguration":{"EbsBlockDeviceConfigs":[{"VolumeSpecification":{"SizeInGB":80,"VolumeType":"gp2"},"VolumesPerInstance":2}]},"InstanceGroupType":"CORE","InstanceType":"c4.8xlarge","Name":"Core - 4"},{"InstanceCount":1,"BidPrice":"OnDemandPrice","EbsConfiguration":{"EbsBlockDeviceConfigs":[{"VolumeSpecification":{"SizeInGB":80,"VolumeType":"gp2"},"VolumesPerInstance":2}]},"InstanceGroupType":"MASTER","InstanceType":"c4.8xlarge","Name":"Master - 1"}]' --auto-scaling-role EMR_AutoScaling_DefaultRole --bootstrap-actions '[{"Path":"s3://pgx-terraform/scripts/sparklyr_emr6.sh","Name":"Install R|RStudio"}]' --ebs-root-volume-size 100 --service-role EMR_DefaultRole --enable-debugging --name 'PGx-ADE' --scale-down-behavior TERMINATE_AT_TASK_COMPLETION --region us-east-1 
+
+```
+
+
+```{r}
+
+library(jsonlite)
+library(here)
+
+```
+
+
+```{sh}
+
+aws emr list-clusters --active | tee ~/ModulatR/data/cluster_info.json
+
+```
+
+
+
+```{r}
+
+cluster_json <- read_json(here("data","cluster_info.json"))
+
+cluster_id <- as.data.frame(cluster_json[["Clusters"]][[1]][["Id"]])
+
+names(cluster_id)  <- "cluster_id"
+
+write.table(cluster_id, here("data","cluster_id.csv"), sep = ";", col.names = FALSE, row.names = FALSE)
+
+cluster_id
+
+```
+
+
+```{sh}
+
+sed -i 's/\"//g' ~/ModulatR/data/cluster_id.csv
+
+mapfile cluster_var < ~/ModulatR/data/cluster_id.csv
+
+aws emr describe-cluster --cluster-id ${cluster_var} | tee ~/ModulatR/data/cluster_description.json
+
+
+```
+
+
+```{r}
+
+
+cluster_description_json <- read_json(here("data","cluster_description.json"))
+
+
+```
+
+
+```{sh}
+
+mapfile cluster_id_var < ~/ModulatR/data/cluster_id.csv
+
+aws emr list-instances --instance-group-type MASTER --cluster-id ${cluster_id_var} | tee ~/ModulatR/data/master_node.json
+
+```
+
+
+
+```{r}
+
+
+master_json <- read_json(here("data","master_node.json"))
+
+master_node_dns <- master_json[["Instances"]][[1]][["PublicDnsName"]]
+
+master_node_instance_id <- master_json[["Instances"]][[1]][["Ec2InstanceId"]]
+
+master_node_instance_id <- as.data.frame(master_node_instance_id)
+
+write.table(master_node_instance_id, here("data","emr_instance_id.csv"), sep = ";", col.names = FALSE, row.names = FALSE)
+
+master_node_dns
+
+master_node_instance_id
+
+
+
+```
+
+
+```{sh}
+
+sed -i 's/\"//g' ~/ModulatR/data/emr_instance_id.csv
+
+mapfile instance_id_var < ~/ModulatR/data/emr_instance_id.csv
+
+aws ec2 associate-address --instance-id ${instance_id_var} --allocation-id eipalloc-02c7d5490720b3cf6
+
+
+```
+

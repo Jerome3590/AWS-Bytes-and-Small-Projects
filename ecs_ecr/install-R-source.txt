@@ -1,0 +1,93 @@
+ARG R_VERSION=4.0.3
+RUN wget https://cran.r-project.org/src/base/R-4/R-${R_VERSION}.tar.gz
+RUN tar -zxvf R-${R_VERSION}.tar.gz
+RUN cd R-${R_VERSION} && ./configure --prefix=/var/runtime --enable-R-shlib --without-recommended-packages --with-aqua=no \
+    --with-tcltk=no --with-ICU=no --disable-nls --disable-R-profiling --disable-BLAS-shlib
+RUN make 
+RUN make install
+
+
+# OpenSSL
+WORKDIR /var/task
+RUN wget https://www.openssl.org/source/openssl-1.1.1g.tar.gz
+RUN tar -zxvf openssl-1.1.1g.tar.gz
+RUN cd openssl-1.1.1g && ./config \
+ --prefix=/var/task \
+ --openssldir=/var/task \
+ shared
+RUN make -C openssl-1.1.1g -j $(nproc)
+RUN make -C openssl-1.1.1g -j $(nproc) install
+RUN cd ..
+
+# curl
+WORKDIR /var/task
+RUN wget https://curl.haxx.se/download/curl-7.72.0.tar.gz
+RUN tar -zxvf curl-7.72.0.tar.gz
+RUN cd curl-7.72.0 && ./configure --prefix=/var/task --with-ssl
+RUN make -C curl-7.72.0 -j $(nproc)
+RUN make -C curl-7.72.0 -j $(nproc) install
+RUN cd ..
+
+# bzip2
+WORKDIR /var/task
+RUN wget -O bzip2-latest.tar.gz https://www.sourceware.org/pub/bzip2/bzip2-latest.tar.gz
+RUN tar -zxvf bzip2-latest.tar.gz
+RUN cd bzip2-1.0.8
+RUN make -C bzip2-1.0.8 -j $(nproc)
+RUN make -C bzip2-1.0.8 -j $(nproc) install PREFIX=var/task
+RUN cd ..
+
+# xz
+WORKDIR /var/task
+RUN wget https://tukaani.org/xz/xz-5.2.5.tar.gz
+RUN tar -zxvf xz-5.2.5.tar.gz
+RUN cd xz-5.2.5 && ./configure --prefix=/var/task --enable-small
+RUN make -C xz-5.2.5 -j $(nproc)
+RUN make -C xz-5.2.5 -j $(nproc) install
+RUN cd ..
+
+# pcre
+WORKDIR /var/task
+RUN wget https://ftp.pcre.org/pub/pcre/pcre2-10.35.tar.gz
+RUN tar -zxvf pcre2-10.35.tar.gz
+RUN cd pcre2-10.35 && ./configure --prefix=/var/task --enable-utf8 --enable-unicode-properties
+RUN make -C pcre2-10.35 -j $(nproc)
+RUN make -C pcre2-10.35 -j $(nproc) install
+RUN cd ..
+
+# libpng
+WORKDIR /var/task
+RUN wget https://sourceforge.net/projects/libpng/files/libpng16/1.6.37/libpng-1.6.37.tar.gz
+RUN tar xzf libpng-1.6.37.tar.gz
+RUN cd libpng-1.6.37 && ./configure --prefix=/var/task
+RUN make -C libpng-1.6.37 -j $(nproc)
+RUN make -C libpng-1.6.37 -j $(nproc) install
+RUN cd ..
+
+# jpeg
+WORKDIR /var/task
+RUN wget -c http://www.ijg.org/files/jpegsrc.v9d.tar.gz
+RUN tar xzf jpegsrc.v9d.tar.gz
+RUN cd jpeg-9d && ./configure --prefix=/var/task
+RUN make -C jpeg-9d -j $(nproc)
+RUN make -C jpeg-9d -j $(nproc) install
+RUN cd ..
+
+# Ghostscript for png
+WORKDIR /var/task
+RUN wget https://github.com/ArtifexSoftware/ghostpdl-downloads/releases/download/gs920/ghostscript-9.20.tar.gz
+RUN tar xzvf ghostscript-9.20.tar.gz
+RUN cd ghostscript-9.20/ && ./autogen.sh && ./configure --prefix=/var/task
+RUN make -C ghostscript-9.20 -j $(nproc)
+RUN make -C ghostscript-9.20 -j $(nproc) install
+RUN cd ..
+
+# libxml2
+WORKDIR /var/task
+RUN wget http://xmlsoft.org/sources/libxml2-2.9.10.tar.gz
+RUN tar -zxvf libxml2-2.9.10.tar.gz
+RUN cd libxml2-2.9.10 && ./configure --prefix=/var/task --without-python
+RUN make -C libxml2-2.9.10 -j $(nproc)
+RUN make -C libxml2-2.9.10 -j $(nproc) install
+RUN cd ..
+

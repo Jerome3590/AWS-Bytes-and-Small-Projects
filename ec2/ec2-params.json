@@ -1,0 +1,19 @@
+{
+  "ImageId": "ami-0533f2ba8a1995cf9",
+  "UserData":"file:://rstudio_cytoscape.sh"
+  "KeyName": "ecs-lambda",
+  "SecurityGroupIds": [ "sg-022872b29e22f2646" ],
+  "InstanceType": "t2.large",
+  "Placement": {
+    "AvailabilityZone": "us-east-1a"
+  },
+
+  "NetworkInterfaces": [
+    {
+      "DeviceIndex": 0,
+      "SubnetId": "subnet-5bfc3416",
+      "Groups": [ "sg-022872b29e22f2646" ],
+      "AssociatePublicIpAddress": true
+    }
+  ]
+}

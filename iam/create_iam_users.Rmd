@@ -1,0 +1,116 @@
+---
+title: "Create_IAM_Users"
+author: "Jerome Dixon"
+date: "3/24/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r load-users}
+
+library(readxl)
+library(dplyr)
+library(stringr)
+
+aws_iam_user_usernames <- read_excel("AWS Lab User Accounts.xlsx", 
+    col_names = FALSE)
+
+names(aws_iam_user_usernames) <- "username"
+
+
+write.table(aws_iam_user_usernames, "usernames.csv", row.names = FALSE, col.names = FALSE, quote = FALSE)
+
+```
+
+
+```{sh iam-create-users}
+
+mapfile -t username_var < ~/AWS_Utilities/iam/usernames.csv
+
+for i in "${!username_var[@]}";
+do   
+  aws iam create-user --user-name ${username_var[i]}
+done
+
+
+```
+
+
+
+
+```{sh iam-create-password}
+
+NUM="2022"
+
+mapfile -t username_var < ~/AWS_Utilities/iam/usernames.csv
+
+for i in "${!username_var[@]}";
+do   
+  aws iam create-login-profile --user-name ${username_var[i]} --password ${username_var[i]^}$NUM 
+done
+
+
+```
+
+## Example password format based on username (username@domain.com)
+
+
+```{sh iam-group-add}
+
+mapfile -t username_var < ~/AWS_Utilities/iam/usernames.csv
+
+for i in "${!username_var[@]}";
+do   
+  aws iam add-user-to-group --user-name ${username_var[i]} --group-name data-science-lab
+done
+
+
+```
+
+
+```{sh iam-get-username}
+
+mapfile -t username_var < ~/AWS_Utilities/iam/usernames.csv
+
+for i in "${!username_var[@]}";
+do   
+  aws iam get-user --user-name ${username_var[i]} >> user.json;
+done
+
+
+```
+
+
+```{sh iam-access-keys}
+
+mapfile -t username_var < ~/AWS_Utilities/iam/usernames.csv
+
+for i in "${!username_var[@]}";
+do   
+  aws iam create-access-key --user-name ${username_var[i]} >> access_keys.json;
+done
+
+
+```
+
+
+```{r}
+
+console_login <- "https://12345678910.signin.aws.amazon.com/console"
+
+user_login_info <- aws_iam_user_usernames %>% mutate(
+                password = paste0(toupper(substr(username,0,1)), substr(username,1,length(username)), '2022'),
+                aws_console_url = paste0(console_login))
+
+
+write.csv(user_login_info, "user_login_info.csv", row.names = FALSE)
+
+```
+
+
+
+

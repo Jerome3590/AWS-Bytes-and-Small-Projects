@@ -1,0 +1,98 @@
+#Lambda base image Amazon Linux
+FROM public.ecr.aws/lambda/provided:al2 as builder 
+
+yum -y update
+yum -y install deltarpm
+
+yum -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm 
+yum -y install yum-utils
+yum-builddep R -y
+yum-config-manager --enable "rhel-*-var/taskional-rpms"
+yum install -q -y wget xorg-x11-server-devel libX11-devel libXt-devel \
+    curl-devel gcc-c++ gcc-gfortran zlib-devel bzip2 bzip2-libs java-1.8.0-openjdk-devel
+ yum -y install python3 libgit2 libxml2-devel openssl-devel pcre2-devel make which openssl11-libs
+
+VERSION=4.0.4
+R_DIR=/var/task/R/
+
+wget -q https://cran.r-project.org/src/base/R-4/R-${VERSION}.tar.gz && \
+    mkdir ${R_DIR} && \
+    tar -xf R-${VERSION}.tar.gz && \
+    mv R-${VERSION}/* ${R_DIR} && \
+    rm R-${VERSION}.tar.gz
+
+cd ${R_DIR}
+ ./configure --prefix=${R_DIR} --exec-prefix=${R_DIR} --with-libpth-prefix=/var/lib --enable-R-shlib && \
+    make
+
+/var/task/R/bin/Rscript -e 'install.packages(c("httr", "aws.signature", "aws.s3", "jsonlite", "logging","xml2"), repos="http://cran.r-project.org")'
+
+/var/task/R/bin/Rscript -e 'install.packages(c("magrittr", "data.table", "tidyverse", "lubridate", "readxl","readr", "reshape2", "purrr"), repos="http://cran.r-project.org")'
+
+/var/task/R/bin/Rscript -e 'install.packages(c("git2r", "bupaR", "deSolve", "ggplot2", "gtable", "kableExtra"), repos="http://cran.r-project.org")'
+  
+/var/task/R/bin/Rscript -e 'install.packages(c("reticulate", "keras", "caret", "renv"), repos="http://cran.r-project.org")'
+  
+  
+# Virtual environment for Reticulate
+/usr/bin/python3 -m pip install --upgrade pip python3 -m venv /var/task/lambda
+source /var/task/lambda/bin/activate
+export R_HOME=/var/task/R/
+/var/task/lambda/bin/pip3 install rpy2 numpy twython scipy pandas matplotlib scikit-learn scrapy beautifulsoup4 twilio boto3 pytextrank spacy
+
+# Project Files
+cp bootstrap /var/runtime
+ chmod 755 /var/time/bootstrap
+
+cp example.R /var/task
+ chmod 755 /var/task/example.R
+
+cp example2.R /var/task
+ chmod 755 /var/task/example2.R
+
+# RStudio for Dev
+wget https://download2.rstudio.org/server/centos8/x86_64/rstudio-server-rhel-1.4.1106-x86_64.rpm
+sudo yum install rstudio-server-rhel-1.4.1106-x86_64.rpm
+
+
+# INSTALL OPENSSL: https://cloudwafer.com/blog/installing-openssl-on-centos-7/
+
+
+# OpenMX:
+/var/task/R/bin/Rscript -e 'source('https://vipbg.vcu.edu/vipbg/OpenMx2/software/getOpenMx.R')'
+
+# JAGS:
+yum install lapack-devel
+
+wget -q https://sourceforge.net/projects/mcmc-jags/files/JAGS/4.x/Source/JAGS-4.3.0.tar.gz
+tar -xf JAGS-4.3.0.tar.gz
+cd  JAGS-4.3.0
+./configure --libdir=/var/lib &&     make &&     make install &&     cd .. 
+
+export R_HOME=/var/task/R
+export PKG_CONFIG_PATH="$PKG_CONFIG_PATH:/var/task/R/JAGS-4.3.0/etc/"
+export PATH="$PATH:/usr/local/bin/jags:/var/lib:/var/task/R/bin:/var/task/lambda/bin/python3:/usr/local/bin/aws:/usr/local/bin/pip3:var/task/R/lib64/R:/var/task/bin:/var/task/lib"
+
+export LD_RUN_PATH=$LD_RUN_PATH:/var/lib:/var/task/R/JAGS-4.3.0/etc/ 
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/var/lib/:/var/task/R/JAGS-4.3.0/etc/
+
+/var/task/R/bin/Rscript -e 'install.packages(c("R2jags"),repos="http://cran.r-project.org")'
+
+
+# Racket:
+sudo yum --enablerepo=epel-testing install racket
+mkdir mediKanren
+
+cd mediKanren
+git clone https://github.com/webyrd/mediKanren.git
+
+
+mkdir semmed
+racket csv-semmed-ordered-unique-enum.rkt semmed.csv semmed
+racket csv-semmed-simplify.rkt semmed.csv semmed
+racket semmed-index-predicate.rkt semmed
+
+
+pip install gremlinpython
+pip install tornado
+pip install botocore

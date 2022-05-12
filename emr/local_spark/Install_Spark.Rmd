@@ -1,0 +1,144 @@
+---
+title: "DBHDS_EDA"
+author: "Jerome Dixon"
+date: "12/16/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+
+knitr::opts_chunk$set(cache = TRUE)
+
+```
+
+
+```{r Load-Libraries, message=FALSE, warning=FALSE}
+
+library(readxl)
+library(sparklyr)
+library(flicker)
+library(dplyr)
+library(magrittr)
+library(DBI)
+library(ggplot2)
+library(dbplot)
+library(tidyverse)
+library(stringr)
+library(here)
+library(aws.s3)
+library(aws.signature)
+library(jsonlite)
+library(rvest)
+library(httr)
+library(scales)
+library(wordcloud)
+library(networkD3)
+library(here)
+
+```
+
+
+```{r}
+
+spark_available_versions()
+
+```
+
+
+```{sh}
+
+cd /home/jdixon/spark
+
+wget https://dlcdn.apache.org/spark/spark-3.2.1/spark-3.2.1-bin-hadoop3.2.tgz
+
+```
+
+
+```{sh}
+
+
+cd /home/jdixon/spark
+
+tar -zxvf spark-3.2.1-bin-hadoop3.2.tgz
+
+
+```
+
+
+
+# Need to copy additional jar files for AWS S3 connection
+# Be careful to match maven jar files to aws-hadoop most recent version. I.e. for current apache spark environment we are using default configuration setting (conf$sparklyr.defaultPackages <- "org.apache.hadoop:hadoop-aws:3.3.2") with hadoop-aws-3.2.2.jar to make AWS S3 extensions work with our spark/hadoop version (spark-3.2.1-bin-hadoop3.2).
+
+```{sh}
+
+
+aws s3 cp s3://pgx-terraform/EMR-JAR-files/ ~/spark/spark-3.2.1-bin-hadoop3.2/jars --recursive
+
+
+```
+
+
+
+```{r Configure-Spark }
+
+#Configure Cluster
+conf <- spark_config()
+conf$sparklyr.defaultPackages <- "org.apache.hadoop:hadoop-aws:3.3.2"
+conf$maximizeResourceAllocation  <- "true"
+
+```
+
+
+```{r Start-Spark-session }
+
+sc <- spark_connect(master = "local", config = conf)
+
+
+```
+
+
+
+```{r Load-Medical-Data }
+
+medical_folder <-"s3a://vhi-apcd/DBHDS/Medical/"
+
+# Read files into Spark dataframe
+medical <-spark_read_csv(sc, name = "Medical", path=medical_folder, infer_schema = TRUE, header = T, delimiter = "|")
+
+
+# Cache table into memory and create dplyr reference to Spark dataframe
+tbl_cache(sc, 'medical')
+medical_tbl <- tbl(sc, 'medical')
+
+```
+
+
+```{r}
+
+
+medical_col_names <- as.data.frame(colnames(medical))
+
+names(medical_col_names) <- "Medical"
+
+medical_col_names
+
+length(medical_col_names)
+
+
+data_types <- medical_col_names %>% mutate(
+  data_type = paste0(medical_col_names$Medical, " = 'character',")
+)
+
+
+data_types$data_type[[1]] <- gsub("'character'", "'date'", data_types$data_type[[1]])
+data_types$data_type[[2]] <- gsub("'character'", "'date'", data_types$data_type[[2]])
+data_types$data_type[[67]] <- gsub("'character'", "'date'", data_types$data_type[[67]])
+data_types$data_type[[69]] <- gsub("'character'", "'date'", data_types$data_type[[69]])
+
+schema_medical <- data_types %>% select(data_type)
+
+
+write_csv(schema_medical, "schema_medical.csv")
+
+
+```

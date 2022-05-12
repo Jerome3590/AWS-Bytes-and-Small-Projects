@@ -1,0 +1,25 @@
+sudo systemctl start docker
+
+sudo docker system prune -a
+
+sudo docker pull amazon/aws-lambda-provided:al2
+
+sudo docker run -it amazon/aws-lambda-provided:al2 bin/bash
+
+sudo docker build -f R.Dockerfile -t r-runtime .
+
+sudo docker exec r-runtime sh
+
+sudo docker run -it public.ecr.aws/docker/library/r-base:latest bin/bash
+
+sudo docker build -f R.Dockerfile -t r-runtime .
+
+sudo docker build -f racket.Dockerfile -t racket-runtime .
+
+sudo docker build -f nodejs.Dockerfile -t nodejs-runtime .
+
+sudo docker run -it public.ecr.aws/lambda/nodejs:latest bin/bash
+
+sudo docker run -it public.ecr.aws/docker/library/r-base:latest bin/bash
+
+sudo yum install docker
