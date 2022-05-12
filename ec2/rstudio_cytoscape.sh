@@ -11,16 +11,16 @@ rver=4.1.2
 rspkg=rstudio-2021.09.2-382-x86_64.rpm
 
 # Add Users
-sudo  useradd marian
-sudo  useradd amber
+sudo  useradd ${user1}
+sudo  useradd ${user2}
 
 # Password users 
-rspasswd1=pgx_2022_VCU3590
-rspasswd2=pgx_2022_VCU3874
+rspasswd1=${password_user1}
+rspasswd2=${password_user2}
 
 # Set passwords for users for R Studio
-sudo sh -c "echo '$rspasswd1' | passwd marian --stdin"
-sudo sh -c "echo '$rspasswd2' | passwd amber --stdin"
+sudo sh -c "echo '$rspasswd1' | passwd ${user1} --stdin"
+sudo sh -c "echo '$rspasswd2' | passwd ${user2} --stdin"
 
 # update everything
 sudo yum update -y
@@ -75,18 +75,17 @@ sudo yum install tigervnc-server
 sudo bash -c 'echo localhost > /etc/tigervnc/vncserver-config-mandatory'
 sudo cp /lib/systemd/system/vncserver@.service /etc/systemd/system/vncserver@.service
 sudo sed -i 's/<USER>/ec2-user/' /etc/systemd/system/vncserver@.service
-sudo sed -i 's/<USER>/jdixon/' /etc/systemd/system/vncserver@.service
-sudo sed -i 's/<USER>/amber/' /etc/systemd/system/vncserver@.service
-sudo sed -i 's/<USER>/marian/' /etc/systemd/system/vncserver@.service
+sudo sed -i 's/<USER>/${user1}/' /etc/systemd/system/vncserver@.service
+sudo sed -i 's/<USER>/${user2}/' /etc/systemd/system/vncserver@.service
 echo SecurityTypes=None >> ~/.vnc/config
 sudo systemctl daemon-reload
 sudo systemctl enable vncserver@:1
 sudo systemctl start vncserver@:1
 
 # Connect via SSH
-# ssh -L 5901:localhost:5901 -i "ecs-lambda.pem" ec2-user@ec2-52-0-237-135.compute-1.amazonaws.com
+# ssh -L 5901:localhost:5901 -i "${ssh-key-pem}" ec2-user@${ip-address-ec2}.compute-1.amazonaws.com
 
-# vncviewer http://52.0.237.135:5901/
+# vncviewer http://${ec2-ip-address}:5901/
 
 
 # Install Cytoscape
