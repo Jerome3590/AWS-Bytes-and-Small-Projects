@@ -12,4 +12,4 @@ Steps:
 9. Add EventBridge rule to fire Lambda every 10 minutes to keep ephemeral storage persistent
 
 
-![](lambda/AWS Lambda 10 GB Ephemereal Storage.png)
+![Lambda Runtimes Hosted in S3](https://github.com/Jerome3590/AWS-Bytes-and-Small-Projects/blob/main/lambda/AWS%20Lambda%2010%20GB%20Ephemereal%20Storage.png)
