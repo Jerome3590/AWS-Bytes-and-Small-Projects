@@ -104,12 +104,13 @@ aws ec2 associate-address --instance-id ${EMR_NODE_ID} --allocation-id eipalloc-
 
 ```
 
-![My EMR Elastic IP](http://52.86.129.48)
+# Setup your elastic IP or use EMR head node DNS
 
 
 ```{r emr-rstudio-ip}
 
-url = "http://52.86.129.48:8787"
+url = Sys.getenv("RSTUDIO_EMR_ELASTIC_IP")
+
 browseURL(url, browser = getOption("browser"),
           encodeIfNeeded = TRUE)
           
