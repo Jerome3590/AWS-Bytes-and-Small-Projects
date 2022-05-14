@@ -104,7 +104,7 @@ aws ec2 associate-address --instance-id ${EMR_NODE_ID} --allocation-id eipalloc-
 
 ```
 
-# Setup your elastic IP or use EMR head node DNS
+# Setup your elastic IP or use EMR head node DNS. Don't forget to add :8787 at the end for RStudio port
 
 
 ```{r emr-rstudio-ip}
