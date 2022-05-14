@@ -1,6 +1,6 @@
 {
     "Cluster": {
-        "Id": "j-36LYKW4WKV3VJ",
+        "Id": "j-1GEHTA7Y4QK5I",
         "Name": "PGx-ADE",
         "Status": {
             "State": "BOOTSTRAPPING",
@@ -8,7 +8,7 @@
                 "Message": "Running bootstrap actions"
             },
             "Timeline": {
-                "CreationDateTime": "2022-04-03T11:34:53.242000+00:00"
+                "CreationDateTime": 1652528890.59
             }
         },
         "Ec2InstanceAttributes": {
@@ -59,13 +59,13 @@
         ],
         "ServiceRole": "EMR_DefaultRole",
         "NormalizedInstanceHours": 0,
-        "MasterPublicDnsName": "ec2-3-94-98-85.compute-1.amazonaws.com",
+        "MasterPublicDnsName": "ec2-54-237-239-78.compute-1.amazonaws.com",
         "Configurations": [],
         "AutoScalingRole": "EMR_AutoScaling_DefaultRole",
         "ScaleDownBehavior": "TERMINATE_AT_TASK_COMPLETION",
         "EbsRootVolumeSize": 100,
         "KerberosAttributes": {},
-        "ClusterArn": "arn:aws:elasticmapreduce:us-east-1:535362115856:cluster/j-36LYKW4WKV3VJ",
+        "ClusterArn": "arn:aws:elasticmapreduce:us-east-1:535362115856:cluster/j-1GEHTA7Y4QK5I",
         "StepConcurrencyLevel": 1,
         "PlacementGroups": [],
         "BootstrapActions": [
@@ -77,12 +77,12 @@
         ],
         "InstanceGroups": [
             {
-                "Id": "ig-VV487YU18ZDJ",
-                "Name": "Core - 4",
+                "Id": "ig-1QE6Z8S6MLEJC",
+                "Name": "Master - 1",
                 "Market": "SPOT",
-                "InstanceGroupType": "CORE",
+                "InstanceGroupType": "MASTER",
                 "InstanceType": "c4.8xlarge",
-                "RequestedInstanceCount": 5,
+                "RequestedInstanceCount": 1,
                 "RunningInstanceCount": 0,
                 "Status": {
                     "State": "BOOTSTRAPPING",
@@ -90,7 +90,7 @@
                         "Message": ""
                     },
                     "Timeline": {
-                        "CreationDateTime": "2022-04-03T11:34:53.246000+00:00"
+                        "CreationDateTime": 1652528890.598
                     }
                 },
                 "Configurations": [],
@@ -114,12 +114,12 @@
                 "ShrinkPolicy": {}
             },
             {
-                "Id": "ig-3H3R4IQ2V9URO",
-                "Name": "Master - 1",
+                "Id": "ig-OBLC4FIQR93L",
+                "Name": "Core - 4",
                 "Market": "SPOT",
-                "InstanceGroupType": "MASTER",
+                "InstanceGroupType": "CORE",
                 "InstanceType": "c4.8xlarge",
-                "RequestedInstanceCount": 1,
+                "RequestedInstanceCount": 5,
                 "RunningInstanceCount": 0,
                 "Status": {
                     "State": "BOOTSTRAPPING",
@@ -127,7 +127,7 @@
                         "Message": ""
                     },
                     "Timeline": {
-                        "CreationDateTime": "2022-04-03T11:34:53.246000+00:00"
+                        "CreationDateTime": 1652528890.598
                     }
                 },
                 "Configurations": [],

@@ -21,40 +21,40 @@ aws emr create-cluster --applications Name=Hadoop Name=Hive Name=Hue Name=Spark 
 library(jsonlite)
 library(here)
 
+cwd <- here::here()
+
+Sys.setenv("CWD"=cwd)
+
 ```
 
 
 ```{sh}
 
-aws emr list-clusters --active | tee ~/ModulatR/data/cluster_info.json
+aws emr list-clusters --active | tee ${CWD}/cluster-config/cluster_info.json
 
 ```
 
 
-
 ```{r}
 
-cluster_json <- read_json(here("data","cluster_info.json"))
+cluster_json <- read_json(here("cluster-config","cluster_info.json"))
 
 cluster_id <- as.data.frame(cluster_json[["Clusters"]][[1]][["Id"]])
 
 names(cluster_id)  <- "cluster_id"
 
-write.table(cluster_id, here("data","cluster_id.csv"), sep = ";", col.names = FALSE, row.names = FALSE)
+write.table(cluster_id, here("cluster-config","cluster_id.csv"), sep = ";", col.names = FALSE, row.names = FALSE)
 
 cluster_id
 
+Sys.setenv("CLUSTER_ID"=cluster_id)
+
 ```
 
 
 ```{sh}
 
-sed -i 's/\"//g' ~/ModulatR/data/cluster_id.csv
-
-mapfile cluster_var < ~/ModulatR/data/cluster_id.csv
-
-aws emr describe-cluster --cluster-id ${cluster_var} | tee ~/ModulatR/data/cluster_description.json
-
+aws emr describe-cluster --cluster-id ${CLUSTER_ID} | tee ${CWD}/cluster-config/cluster_description.json
 
 ```
 
@@ -62,7 +62,7 @@ aws emr describe-cluster --cluster-id ${cluster_var} | tee ~/ModulatR/data/clust
 ```{r}
 
 
-cluster_description_json <- read_json(here("data","cluster_description.json"))
+cluster_description_json <- read_json(here("cluster-config","cluster_description.json"))
 
 
 ```
@@ -70,9 +70,7 @@ cluster_description_json <- read_json(here("data","cluster_description.json"))
 
 ```{sh}
 
-mapfile cluster_id_var < ~/ModulatR/data/cluster_id.csv
-
-aws emr list-instances --instance-group-type MASTER --cluster-id ${cluster_id_var} | tee ~/ModulatR/data/master_node.json
+aws emr list-instances --instance-group-type MASTER --cluster-id ${CLUSTER_ID} | tee ${CWD}/cluster-config/master_node.json
 
 ```
 
@@ -80,34 +78,46 @@ aws emr list-instances --instance-group-type MASTER --cluster-id ${cluster_id_va
 
 ```{r}
 
+emr_json <- read_json(here("cluster-config","master_node.json"))
 
-master_json <- read_json(here("data","master_node.json"))
+emr_dns <- master_json[["Instances"]][[1]][["PublicDnsName"]]
 
-master_node_dns <- master_json[["Instances"]][[1]][["PublicDnsName"]]
+emr_instance_id <- master_json[["Instances"]][[1]][["Ec2InstanceId"]]
 
-master_node_instance_id <- master_json[["Instances"]][[1]][["Ec2InstanceId"]]
+emr_instance_id <- as.data.frame(emr_instance_id)
 
-master_node_instance_id <- as.data.frame(master_node_instance_id)
+write.table(emr_instance_id, here("cluster-config","emr_instance_id.csv"), sep = ";", col.names = FALSE, row.names = FALSE)
 
-write.table(master_node_instance_id, here("data","emr_instance_id.csv"), sep = ";", col.names = FALSE, row.names = FALSE)
+emr_dns
 
-master_node_dns
+emr_instance_id
 
-master_node_instance_id
-
-
+Sys.setenv("EMR_NODE_ID"=emr_instance_id)
 
 ```
 
 
 ```{sh}
 
-sed -i 's/\"//g' ~/ModulatR/data/emr_instance_id.csv
-
-mapfile instance_id_var < ~/ModulatR/data/emr_instance_id.csv
-
-aws ec2 associate-address --instance-id ${instance_id_var} --allocation-id eipalloc-02c7d5490720b3cf6
+aws ec2 associate-address --instance-id ${EMR_NODE_ID} --allocation-id eipalloc-02c7d5490720b3cf6
 
 
 ```
 
+![My EMR Elastic IP](http://52.86.129.48)
+
+
+```{r emr-rstudio-ip}
+
+url = "http://52.86.129.48:8787"
+browseURL(url, browser = getOption("browser"),
+          encodeIfNeeded = TRUE)
+          
+```
+
+
+```{r Render-Markdown, include=FALSE}
+
+rmarkdown::render("Launch_EMR_Cluster.Rmd")
+
+```
