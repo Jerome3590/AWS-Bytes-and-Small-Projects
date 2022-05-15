@@ -70,7 +70,7 @@ cluster_description_json <- read_json(here("cluster-config","cluster_description
 
 ```{sh}
 
-aws emr list-instances --instance-group-type MASTER --cluster-id ${CLUSTER_ID} | tee ${CWD}/cluster-config/master_node.json
+aws emr list-instances --instance-group-type MASTER --cluster-id ${CLUSTER_ID} | tee ${CWD}/cluster-config/emr_node.json
 
 ```
 
@@ -78,11 +78,11 @@ aws emr list-instances --instance-group-type MASTER --cluster-id ${CLUSTER_ID} |
 
 ```{r}
 
-emr_json <- read_json(here("cluster-config","master_node.json"))
+emr_json <- read_json(here("cluster-config","emr_node.json"))
 
-emr_dns <- master_json[["Instances"]][[1]][["PublicDnsName"]]
+emr_dns <- emr_json[["Instances"]][[1]][["PublicDnsName"]]
 
-emr_instance_id <- master_json[["Instances"]][[1]][["Ec2InstanceId"]]
+emr_instance_id <- emr_json[["Instances"]][[1]][["Ec2InstanceId"]]
 
 emr_instance_id <- as.data.frame(emr_instance_id)
 
