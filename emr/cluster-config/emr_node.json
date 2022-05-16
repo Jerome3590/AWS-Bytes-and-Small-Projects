@@ -1,0 +1,32 @@
+{
+    "Instances": [
+        {
+            "Id": "ci-1BBSI19AA4MWR",
+            "Ec2InstanceId": "i-012b82dee4c9e3f86",
+            "PublicDnsName": "ec2-18-212-85-187.compute-1.amazonaws.com",
+            "PublicIpAddress": "18.212.85.187",
+            "PrivateDnsName": "ip-172-31-97-147.ec2.internal",
+            "PrivateIpAddress": "172.31.97.147",
+            "Status": {
+                "State": "BOOTSTRAPPING",
+                "StateChangeReason": {},
+                "Timeline": {
+                    "CreationDateTime": 1652701195.36
+                }
+            },
+            "InstanceGroupId": "ig-2MUO0BO3KAYQQ",
+            "Market": "SPOT",
+            "InstanceType": "c4.8xlarge",
+            "EbsVolumes": [
+                {
+                    "Device": "/dev/sdc",
+                    "VolumeId": "vol-0301fced9403bde1e"
+                },
+                {
+                    "Device": "/dev/sdb",
+                    "VolumeId": "vol-07d962032958854d1"
+                }
+            ]
+        }
+    ]
+}

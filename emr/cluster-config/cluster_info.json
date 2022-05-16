@@ -1,19 +1,17 @@
 {
     "Clusters": [
         {
-            "Id": "j-1GEHTA7Y4QK5I",
+            "Id": "j-UIEDK97V9XW3",
             "Name": "PGx-ADE",
             "Status": {
-                "State": "BOOTSTRAPPING",
-                "StateChangeReason": {
-                    "Message": "Running bootstrap actions"
-                },
+                "State": "STARTING",
+                "StateChangeReason": {},
                 "Timeline": {
-                    "CreationDateTime": 1652528890.59
+                    "CreationDateTime": 1652700983.812
                 }
             },
             "NormalizedInstanceHours": 0,
-            "ClusterArn": "arn:aws:elasticmapreduce:us-east-1:535362115856:cluster/j-1GEHTA7Y4QK5I"
+            "ClusterArn": "arn:aws:elasticmapreduce:us-east-1:535362115856:cluster/j-UIEDK97V9XW3"
         }
     ]
 }
